@@ -1,4 +1,4 @@
-package cloudflarewarp_test
+package RealIPs_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	plugin "github.com/BetterCorp/cloudflarewarp"
+	plugin "github.com/emigrating/RealIPs"
 )
 
 func TestNew(t *testing.T) {
