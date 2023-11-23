@@ -1,5 +1,5 @@
-// Package cloudflarewarp Traefik Plugin.
-package cloudflarewarp
+// Package RealIPs Traefik Plugin.
+package RealIPs
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/BetterCorp/cloudflarewarp/ips"
+	"github.com/emigrating/RealIPs/ips"
 )
 
 const (
@@ -112,14 +112,31 @@ func (r *RealIPOverWriter) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			req.Header.Set(xForwardProto, cfVisitorValue.Scheme)
 		}
 		req.Header.Set(xCfTrusted, "yes")
-		req.Header.Set(xForwardFor, req.Header.Get(cfConnectingIP))
-		req.Header.Set(xRealIP, req.Header.Get(cfConnectingIP))
+
+		// Constructing X-Forwarded-For header with proper order
+		existingFor := req.Header.Get(xForwardFor)
+		if existingFor != "" {
+			existingFor += ", "
+		}
+		existingFor += req.Header.Get(cfConnectingIP) // Cloudflare IP added first
+		req.Header.Set(xForwardFor, existingFor)
+		req.Header.Set(xRealIP, req.Header.Get(cfConnectingIP)) // Set X-Real-IP to the Cloudflare IP
 	} else {
 		req.Header.Set(xCfTrusted, "no")
-		req.Header.Set(xRealIP, trustResult.directIP)
+
+		// Constructing X-Forwarded-For header with direct IP
+		existingFor := req.Header.Get(xForwardFor)
+		if existingFor != "" {
+			existingFor += ", "
+		}
+		existingFor += trustResult.directIP // Direct IP added first
+		req.Header.Set(xForwardFor, existingFor)
+		req.Header.Set(xRealIP, trustResult.directIP) // Set X-Real-IP to the direct IP
+
 		req.Header.Del(cfVisitor)
 		req.Header.Del(cfConnectingIP)
 	}
+
 	r.next.ServeHTTP(rw, req)
 }
 

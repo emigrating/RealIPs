@@ -1,9 +1,9 @@
-displayName: Real IP from Cloudflare Proxy/Tunnel
+displayName: Real IPs reverse proxies
 type: middleware
-import: github.com/BetterCorp/cloudflarewarp
+import: github.com/emigrating/RealIPs
 iconPath: .assets/icon.png
 
-summary: get real IP and proto from Cloudflare Proxy/Tunnel
+summary: get real IP and proto from Proxies/Tunnels
 
 testData:
   disableDefault: false
